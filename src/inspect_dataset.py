@@ -4,19 +4,14 @@ from pathlib import Path
 
 import cv2
 
-
-DATASET_DIR: Path = Path(
-    "data/raw/kagglehub/datasets/atulyakumar98/pothole-detection-dataset/versions/4"
-)
-CLASSES: tuple[str, ...] = ("normal", "potholes")
-IMAGE_EXTENSIONS: tuple[str, ...] = (".jpg", ".jpeg", ".png", ".webp")
+from src.config import CLASSES, IMAGE_EXTENSIONS, RAW_DATASET_DIR
 
 
 def size_count(size_info: tuple[tuple[int, int], int]) -> int:
     return size_info[1]
 
 
-def inspect_dataset(dataset_dir: Path = DATASET_DIR) -> None:
+def inspect_dataset(dataset_dir: Path = RAW_DATASET_DIR) -> None:
     if not dataset_dir.exists():
         raise FileNotFoundError(
             f"Dataset not found at {dataset_dir}. Run: uv run python -m src.download_dataset"

@@ -5,12 +5,10 @@ from pathlib import Path
 
 import kagglehub
 
-
-DATASET: str = "atulyakumar98/pothole-detection-dataset"
-CACHE_DIR: Path = Path("data/raw/kagglehub")
+from src.config import DATASET, KAGGLE_CACHE_DIR
 
 
-def download_dataset(dataset: str = DATASET, cache_dir: Path = CACHE_DIR) -> Path:
+def download_dataset(dataset: str = DATASET, cache_dir: Path = KAGGLE_CACHE_DIR) -> Path:
     cache_dir.mkdir(parents=True, exist_ok=True)
     os.environ["KAGGLEHUB_CACHE"] = str(cache_dir)
 

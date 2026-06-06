@@ -4,14 +4,9 @@ import random
 import shutil
 from pathlib import Path
 
+from src.config import CLASSES, IMAGE_EXTENSIONS, PROCESSED_DATASET_DIR, RAW_DATASET_DIR
 
-RAW_DATASET_DIR: Path = Path(
-    "data/raw/kagglehub/datasets/atulyakumar98/pothole-detection-dataset/versions/4"
-)
-PROCESSED_DATASET_DIR: Path = Path("data/processed/classification")
-CLASSES: tuple[str, ...] = ("normal", "potholes")
 SPLITS: tuple[str, ...] = ("train", "val", "test")
-IMAGE_EXTENSIONS: tuple[str, ...] = (".jpg", ".jpeg", ".png", ".webp")
 RANDOM_SEED: int = 42
 TRAIN_RATIO: float = 0.70
 VAL_RATIO: float = 0.15
