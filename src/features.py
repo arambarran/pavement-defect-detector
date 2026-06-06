@@ -17,6 +17,8 @@ HOG_DESCRIPTOR = cv2.HOGDescriptor(
     9,
 )
 
+COLOR_BINS: int = 32
+
 
 def load_image(path: Path) -> np.ndarray:
     # OpenCV returns None when a file is missing or unreadable.
@@ -30,18 +32,25 @@ def load_image(path: Path) -> np.ndarray:
 
 def preprocess_image(image: np.ndarray) -> np.ndarray:
     # Every image needs the same size and color format before feature extraction.
-    resized_image = cv2.resize(image, IMAGE_SIZE)
-    grayscale_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
-
-    return grayscale_image
+    return cv2.resize(image, IMAGE_SIZE)
 
 
 def extract_hog_features_from_image(image: np.ndarray) -> np.ndarray:
-    # This is the full image-to-numbers step used by the classifier.
-    processed_image = preprocess_image(image)
-    features = HOG_DESCRIPTOR.compute(processed_image)
+    resized = preprocess_image(image)
+    gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
+    hog = HOG_DESCRIPTOR.compute(gray).flatten()
 
-    return features.flatten()
+    # HSV color histograms capture brightness and saturation cues that HOG misses.
+    # Potholes tend to be darker and more desaturated than intact road surface.
+    hsv = cv2.cvtColor(resized, cv2.COLOR_BGR2HSV)
+    color_hists = [
+        cv2.calcHist([hsv], [ch], None, [COLOR_BINS], [0, 256]).flatten()
+        for ch in range(3)
+    ]
+    color_features = np.concatenate(color_hists)
+    color_features /= color_features.sum() + 1e-6
+
+    return np.concatenate([hog, color_features])
 
 
 def extract_hog_features(path: Path) -> np.ndarray:
