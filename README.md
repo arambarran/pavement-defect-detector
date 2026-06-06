@@ -1,90 +1,101 @@
 # Pavement Defect Detector
 
-A pothole and pavement defect detector built with scikit-learn and OpenCV. This project is a hands-on introduction to machine learning and computer vision — covering image preprocessing, feature extraction, and classical ML classification without deep learning frameworks.
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![uv](https://img.shields.io/badge/package%20manager-uv-green)
+![OpenCV](https://img.shields.io/badge/computer%20vision-OpenCV-red)
+![scikit--learn](https://img.shields.io/badge/model-scikit--learn-orange)
 
-## Goal
+Classical computer vision pipeline for classifying road images as `normal` or `potholes`.
 
-Learn the fundamentals of ML and CV by building a working defect detector from scratch:
+This project is built as a learning path for:
 
-- **Computer vision basics** — load, resize, and preprocess road images with OpenCV
-- **Feature engineering** — extract meaningful features (texture, edges, color histograms) from images by hand
-- **Classical ML** — train and evaluate scikit-learn classifiers (e.g. SVM, Random Forest) on extracted features
-- **Model persistence** — save and load trained models with joblib
-- **Interactive demo** — explore predictions through a Streamlit UI
+- loading datasets from Kaggle
+- inspecting and preparing image data
+- extracting HOG features with OpenCV
+- training a baseline scikit-learn classifier
+- evaluating and running single-image predictions
 
 ## Stack
 
 | Tool | Purpose |
-|---|---|
-| `scikit-learn` | Classification models and evaluation |
-| `opencv-python` | Image loading and preprocessing |
-| `numpy` / `pandas` | Feature arrays and data handling |
-| `matplotlib` | Visualization |
-| `streamlit` | Interactive prediction UI |
-| `joblib` | Model serialization |
+| --- | --- |
+| `uv` | environment and command runner |
+| `kagglehub` | Kaggle dataset download |
+| `opencv-python` | image loading, resizing, grayscale conversion, HOG features |
+| `scikit-learn` | classifier, metrics, model pipeline |
+| `numpy` | feature arrays and labels |
+| `joblib` | saving and loading trained models |
 
-## Project Structure
+## Project Layout
 
-```
+```text
 pavement-defect-detector/
-├── data/
-│   ├── raw/          # Original road images
-│   └── processed/    # Extracted features / preprocessed data
-├── models/           # Saved trained models
-├── src/              # Source modules (preprocessing, features, training)
-├── main.py           # Entry point
-└── pyproject.toml
+├── data/                 # ignored raw and processed datasets
+├── models/               # ignored trained model artifacts
+├── src/
+│   ├── config.py
+│   ├── download_dataset.py
+│   ├── inspect_dataset.py
+│   ├── prepare_dataset.py
+│   ├── features.py
+│   ├── train_classifier.py
+│   ├── evaluate_classifier.py
+│   └── predict.py
+├── main.py
+├── pyproject.toml
+└── README.md
 ```
 
-## Getting Started
+## Setup
 
-Install dependencies with [uv](https://github.com/astral-sh/uv):
+Install dependencies:
 
 ```bash
 uv sync
 ```
 
-## Download Dataset
-
-Create a Kaggle API token from your Kaggle account settings, then place it at:
+Create a Kaggle API token from your Kaggle account settings and place it here:
 
 ```text
 ~/.kaggle/kaggle.json
 ```
 
-Set the expected file permissions:
+Set token permissions:
 
 ```bash
 chmod 600 ~/.kaggle/kaggle.json
 ```
 
-Download the binary pothole classification dataset through the Kaggle API:
+## Dataset
+
+Default Kaggle dataset:
+
+```text
+atulyakumar98/pothole-detection-dataset
+```
+
+KaggleHub stores downloaded files under:
+
+```text
+data/raw/kagglehub/
+```
+
+The raw dataset is expected to contain:
+
+```text
+normal/
+potholes/
+```
+
+## Pipeline
+
+Run the full classification workflow one step at a time:
 
 ```bash
 uv run python -m src.download_dataset
-```
-
-Inspect the downloaded dataset:
-
-```bash
 uv run python -m src.inspect_dataset
-```
-
-Prepare train, validation, and test folders:
-
-```bash
 uv run python -m src.prepare_dataset
-```
-
-Train the first classifier:
-
-```bash
 uv run python -m src.train_classifier
-```
-
-Evaluate the saved classifier on the test set:
-
-```bash
 uv run python -m src.evaluate_classifier
 ```
 
@@ -94,20 +105,47 @@ Predict one image:
 uv run python -m src.predict path/to/image.jpg
 ```
 
-By default this downloads:
+## Current Baseline
+
+Model:
 
 ```text
-atulyakumar98/pothole-detection-dataset
+HOG features + StandardScaler + LinearSVC
 ```
 
-and stores KaggleHub's cache under:
+Latest observed validation accuracy:
 
 ```text
-data/raw/kagglehub/
+0.891
 ```
 
-Run the project:
+Latest observed test accuracy:
 
-```bash
-uv run python main.py
+```text
+0.856
+```
+
+Test confusion matrix:
+
+```text
+[[45  9]
+ [ 6 44]]
+```
+
+Using `potholes` as the positive class:
+
+| Metric | Count | Meaning |
+| --- | ---: | --- |
+| TN | 45 | actual normal, predicted normal |
+| FP | 9 | actual normal, predicted potholes |
+| FN | 6 | actual potholes, predicted normal |
+| TP | 44 | actual potholes, predicted potholes |
+
+## Generated Files
+
+These are created locally and ignored by git:
+
+```text
+data/
+models/
 ```

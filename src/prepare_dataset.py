@@ -4,22 +4,13 @@ import random
 import shutil
 from pathlib import Path
 
-from src.config import CLASSES, IMAGE_EXTENSIONS, PROCESSED_DATASET_DIR, RAW_DATASET_DIR
+from src.config import CLASSES, PROCESSED_DATASET_DIR, RAW_DATASET_DIR
+from src.dataset import image_paths
 
 SPLITS: tuple[str, ...] = ("train", "val", "test")
 RANDOM_SEED: int = 42
 TRAIN_RATIO: float = 0.70
 VAL_RATIO: float = 0.15
-
-
-def image_paths(class_dir: Path) -> list[Path]:
-    paths: list[Path] = []
-
-    for path in class_dir.iterdir():
-        if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS:
-            paths.append(path)
-
-    return paths
 
 
 def copy_images(paths: list[Path], output_dir: Path) -> None:
