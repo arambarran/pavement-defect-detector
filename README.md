@@ -1,166 +1,120 @@
 # Pavement Defect Detector
 
+A computer vision pipeline that classifies road images as **normal** or **pothole-damaged** — built entirely with classical CV, no neural networks required.
+
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![uv](https://img.shields.io/badge/package%20manager-uv-green)
-![OpenCV](https://img.shields.io/badge/computer%20vision-OpenCV-red)
-![scikit--learn](https://img.shields.io/badge/model-scikit--learn-orange)
+![OpenCV](https://img.shields.io/badge/OpenCV-HOG%20features-informational)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-LinearSVC-orange)
+![Streamlit](https://img.shields.io/badge/Streamlit-demo%20app-red)
 
-Classical computer vision pipeline for classifying road images as `normal` or `potholes`.
+---
 
-This project is built as a learning path for:
+## Demo
 
-- loading datasets from Kaggle
-- inspecting and preparing image data
-- extracting HOG features with OpenCV
-- training a baseline scikit-learn classifier
-- evaluating and running single-image predictions
-
-## Stack
-
-| Tool | Purpose |
-| --- | --- |
-| `uv` | environment and command runner |
-| `kagglehub` | Kaggle dataset download |
-| `opencv-python` | image loading, resizing, grayscale conversion, HOG features |
-| `scikit-learn` | classifier, metrics, model pipeline |
-| `numpy` | feature arrays and labels |
-| `joblib` | saving and loading trained models |
-
-## Project Layout
-
-```text
-pavement-defect-detector/
-├── data/                 # ignored raw and processed datasets
-├── models/               # ignored trained model artifacts
-├── outputs/              # ignored reports and analysis outputs
-├── src/
-│   ├── config.py
-│   ├── download_dataset.py
-│   ├── inspect_dataset.py
-│   ├── prepare_dataset.py
-│   ├── features.py
-│   ├── train_classifier.py
-│   ├── evaluate_classifier.py
-│   ├── analyze_errors.py
-│   ├── visualize_errors.py
-│   ├── app.py
-│   └── predict.py
-├── main.py
-├── pyproject.toml
-└── README.md
-```
-
-## Setup
-
-Install dependencies:
+Run the interactive app locally:
 
 ```bash
 uv sync
+uv run python -m src.train_classifier   # train once
+uv run streamlit run src/app.py         # open the app
 ```
 
-## Dataset
+Upload any road photo and get an instant verdict with model confidence.
 
-Default Kaggle dataset:
+> Add screenshots of the app here once running.
 
-```text
-atulyakumar98/pothole-detection-dataset
+---
+
+## How It Works
+
+```
+Raw image
+    ↓  resize to 128×128
+    ↓  HOG (gradient/shape features)  +  HSV color histograms
+    ↓  StandardScaler
+    ↓  LinearSVC
+  Normal / Pothole
 ```
 
-KaggleHub stores downloaded files under:
+**Feature extraction** combines two complementary signals:
+- **HOG** (Histogram of Oriented Gradients) — captures edge and shape patterns like cracks and surface breaks
+- **HSV color histograms** — captures brightness and saturation, since potholes tend to be darker and less saturated than intact road
 
-```text
-data/raw/kagglehub/
+**Classifier**: a linear SVM with balanced class weights, trained on ~400 labelled images from the [Kaggle pothole detection dataset](https://www.kaggle.com/datasets/atulyakumar98/pothole-detection-dataset).
+
+---
+
+## Results
+
+| Split | Accuracy |
+|---|---|
+| Validation | **95.0%** |
+| Test | **86.5%** |
+
+Test set confusion matrix (50 pothole / 54 normal images):
+
+```
+              Predicted
+              Normal  Pothole
+Actual Normal   44      10
+Actual Pothole   4      46
 ```
 
-Download the dataset:
+| Metric | Value |
+|---|---|
+| Precision (potholes) | 0.82 |
+| Recall (potholes) | 0.92 |
+| F1 (potholes) | 0.87 |
 
-```bash
-uv run python -m src.download_dataset
+The model is tuned to favour recall on potholes — it is better to flag a good road for inspection than to miss real damage.
+
+---
+
+## Stack
+
+| Tool | Role |
+|---|---|
+| `opencv-python` | image loading, resizing, HOG and HSV feature extraction |
+| `scikit-learn` | SVM classifier, pipeline, evaluation metrics |
+| `numpy` | feature arrays |
+| `joblib` | model serialisation |
+| `streamlit` | interactive demo app |
+| `kagglehub` | dataset download |
+| `uv` | dependency management and task runner |
+
+---
+
+## Project Layout
+
+```
+pavement-defect-detector/
+├── src/
+│   ├── config.py              # paths and constants
+│   ├── download_dataset.py    # fetch from Kaggle
+│   ├── prepare_dataset.py     # train/val/test split
+│   ├── features.py            # HOG + color histogram extraction
+│   ├── train_classifier.py    # fit and save the model
+│   ├── evaluate_classifier.py # test-set metrics
+│   ├── analyze_errors.py      # per-image error report
+│   ├── visualize_errors.py    # false positive/negative grids
+│   ├── predict.py             # single-image CLI prediction
+│   └── app.py                 # Streamlit demo
+├── data/                      # raw and processed datasets (git-ignored)
+├── models/                    # saved model artifacts (git-ignored)
+├── outputs/                   # reports and visualisations (git-ignored)
+└── pyproject.toml
 ```
 
-The raw dataset is expected to contain:
-
-```text
-normal/
-potholes/
-```
+---
 
 ## Pipeline
 
-Run the full classification workflow one step at a time:
-
 ```bash
-uv run python -m src.download_dataset
-uv run python -m src.inspect_dataset
-uv run python -m src.prepare_dataset
-uv run python -m src.train_classifier
+uv run python -m src.download_dataset    # download Kaggle dataset
+uv run python -m src.prepare_dataset    # split into train/val/test
+uv run python -m src.train_classifier   # fit the model
 uv run python -m src.evaluate_classifier
-uv run python -m src.analyze_errors
-uv run python -m src.visualize_errors
-```
-
-Predict one image:
-
-```bash
+uv run python -m src.analyze_errors     # CSV report of all errors
+uv run python -m src.visualize_errors   # image grids of FP/FN
 uv run python -m src.predict path/to/image.jpg
-```
-
-Run the Streamlit app:
-
-```bash
-uv run streamlit run src/app.py
-```
-
-## Current Baseline
-
-Model:
-
-```text
-HOG features + StandardScaler + LinearSVC
-```
-
-Latest observed validation accuracy:
-
-```text
-0.891
-```
-
-Latest observed test accuracy:
-
-```text
-0.856
-```
-
-Test confusion matrix:
-
-```text
-[[45  9]
- [ 6 44]]
-```
-
-Using `potholes` as the positive class:
-
-| Metric | Count | Meaning |
-| --- | ---: | --- |
-| TN | 45 | actual normal, predicted normal |
-| FP | 9 | actual normal, predicted potholes |
-| FN | 6 | actual potholes, predicted normal |
-| TP | 44 | actual potholes, predicted potholes |
-
-Error analysis report:
-
-```text
-outputs/error_analysis.csv
-outputs/false_positives.png
-outputs/false_negatives.png
-```
-
-## Generated Files
-
-These are created locally and ignored by git:
-
-```text
-data/
-models/
-outputs/
 ```
