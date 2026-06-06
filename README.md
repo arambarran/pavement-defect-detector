@@ -88,6 +88,12 @@ Evaluate the saved classifier on the test set:
 uv run python -m src.evaluate_classifier
 ```
 
+Predict one image:
+
+```bash
+uv run python -m src.predict path/to/image.jpg
+```
+
 By default this downloads:
 
 ```text
