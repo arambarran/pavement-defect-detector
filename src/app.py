@@ -17,50 +17,7 @@ from src.config import CLASSES, MODEL_PATH  # noqa: E402
 from src.features import extract_hog_features_from_image  # noqa: E402
 
 
-st.set_page_config(
-    page_title="Pavement Defect Detector",
-    page_icon="🛣️",
-    layout="centered",
-)
-
-st.markdown(
-    """
-    <style>
-    .verdict-box {
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin-top: 8px;
-        margin-bottom: 8px;
-    }
-    .verdict-normal {
-        background-color: #0d3320;
-        border: 1px solid #1a6640;
-    }
-    .verdict-pothole {
-        background-color: #3a1a1a;
-        border: 1px solid #8b3a3a;
-    }
-    .verdict-label {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-    .verdict-sub {
-        font-size: 13px;
-        opacity: 0.7;
-    }
-    .section-label {
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        opacity: 0.5;
-        margin-bottom: 6px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+st.set_page_config(page_title="Pavement Defect Detector", layout="centered")
 
 
 @st.cache_resource
@@ -90,92 +47,38 @@ def predict_uploaded_image(image: np.ndarray) -> tuple[str, float]:
     return CLASSES[prediction], float(decision_score)
 
 
-def confidence_from_score(decision_score: float) -> float:
-    """Map decision score to a 0–1 confidence value via sigmoid."""
-    return 1.0 / (1.0 + np.exp(-abs(decision_score)))
-
-
-def render_result(prediction: str, decision_score: float) -> None:
-    confidence = confidence_from_score(decision_score)
-    is_pothole = prediction == "potholes"
-
-    icon = "⚠️" if is_pothole else "✅"
-    label = "Pothole detected" if is_pothole else "Normal road surface"
-    box_class = "verdict-pothole" if is_pothole else "verdict-normal"
-    sub = "Road damage identified — inspection recommended." if is_pothole else "No visible defects detected."
-
-    st.markdown(
-        f"""
-        <div class="verdict-box {box_class}">
-            <div class="verdict-label">{icon}&nbsp; {label}</div>
-            <div class="verdict-sub">{sub}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown('<div class="section-label">Model confidence</div>', unsafe_allow_html=True)
-    st.progress(confidence, text=f"{confidence * 100:.0f}%")
-
-    with st.expander("Details"):
-        st.caption(
-            f"Raw decision score: `{decision_score:.4f}` — "
-            "positive values lean toward potholes, negative toward normal."
-        )
-        st.caption(
-            "Features: HOG (shape/gradient) + HSV color histograms. "
-            "Classifier: LinearSVC trained on the Kaggle pothole detection dataset."
-        )
-
-
 def main() -> None:
-    st.title("🛣️ Pavement Defect Detector")
-    st.caption(
-        "Upload a road photo to instantly classify it as normal or pothole-damaged — "
-        "no GPU, no deep learning, just computer vision."
-    )
-
-    st.divider()
+    st.title("Pavement Defect Detector")
+    st.caption("Classifies a road image as normal or potholes using HOG features and a linear SVM.")
 
     if not MODEL_PATH.exists():
-        st.error(
-            "Trained model not found. Run `uv run python -m src.train_classifier` first.",
-            icon="🚫",
-        )
+        st.error("Trained model not found. Run `uv run python -m src.train_classifier` first.")
         return
 
-    uploaded_file = st.file_uploader(
-        "Drop a road image here",
-        type=["jpg", "jpeg", "png", "webp"],
-        label_visibility="collapsed",
-    )
+    uploaded_file = st.file_uploader("Upload a road image", type=["jpg", "jpeg", "png", "webp"])
 
     if uploaded_file is None:
-        st.markdown(
-            '<div style="text-align:center; opacity:0.4; padding: 40px 0; font-size:15px;">'
-            "📂 Upload a road image to run a prediction"
-            "</div>",
-            unsafe_allow_html=True,
-        )
+        st.info("Upload an image to run a prediction.")
         return
 
-    img_col, result_col = st.columns([1.1, 1], gap="large")
+    st.image(uploaded_file, caption="Uploaded image", width="stretch")
 
-    with img_col:
-        st.markdown('<div class="section-label">Input image</div>', unsafe_allow_html=True)
-        st.image(uploaded_file, use_container_width=True)
+    try:
+        image = read_uploaded_image(uploaded_file)
+        prediction, decision_score = predict_uploaded_image(image)
+    except ValueError as error:
+        st.error(str(error))
+        return
 
-    with result_col:
-        st.markdown('<div class="section-label">Analysis</div>', unsafe_allow_html=True)
+    st.subheader("Prediction")
+    st.metric("Class", prediction)
+    st.metric("Decision score", f"{decision_score:.3f}")
 
-        try:
-            image = read_uploaded_image(uploaded_file)
-            prediction, decision_score = predict_uploaded_image(image)
-        except ValueError as error:
-            st.error(str(error))
-            return
+    if decision_score >= 0:
+        st.info("Positive scores lean toward potholes.")
+        return
 
-        render_result(prediction, decision_score)
+    st.info("Negative scores lean toward normal.")
 
 
 if __name__ == "__main__":
