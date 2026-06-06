@@ -76,6 +76,12 @@ Prepare train, validation, and test folders:
 uv run python -m src.prepare_dataset
 ```
 
+Train the first classifier:
+
+```bash
+uv run python -m src.train_classifier
+```
+
 By default this downloads:
 
 ```text
