@@ -32,6 +32,7 @@ This project is built as a learning path for:
 pavement-defect-detector/
 ├── data/                 # ignored raw and processed datasets
 ├── models/               # ignored trained model artifacts
+├── outputs/              # ignored reports and analysis outputs
 ├── src/
 │   ├── config.py
 │   ├── download_dataset.py
@@ -40,6 +41,7 @@ pavement-defect-detector/
 │   ├── features.py
 │   ├── train_classifier.py
 │   ├── evaluate_classifier.py
+│   ├── analyze_errors.py
 │   └── predict.py
 ├── main.py
 ├── pyproject.toml
@@ -91,6 +93,7 @@ uv run python -m src.inspect_dataset
 uv run python -m src.prepare_dataset
 uv run python -m src.train_classifier
 uv run python -m src.evaluate_classifier
+uv run python -m src.analyze_errors
 ```
 
 Predict one image:
@@ -135,6 +138,12 @@ Using `potholes` as the positive class:
 | FN | 6 | actual potholes, predicted normal |
 | TP | 44 | actual potholes, predicted potholes |
 
+Error analysis report:
+
+```text
+outputs/error_analysis.csv
+```
+
 ## Generated Files
 
 These are created locally and ignored by git:
@@ -142,4 +151,5 @@ These are created locally and ignored by git:
 ```text
 data/
 models/
+outputs/
 ```

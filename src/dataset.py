@@ -31,3 +31,20 @@ def load_feature_split(split_dir: Path) -> tuple[np.ndarray, np.ndarray]:
             labels.append(label)
 
     return np.array(features), np.array(labels)
+
+
+def load_feature_split_with_paths(split_dir: Path) -> tuple[np.ndarray, np.ndarray, list[Path]]:
+    # Keep paths when we need to inspect which specific images were wrong.
+    features: list[np.ndarray] = []
+    labels: list[int] = []
+    paths: list[Path] = []
+
+    for label, class_name in enumerate(CLASSES):
+        class_dir = split_dir / class_name
+
+        for path in image_paths(class_dir):
+            features.append(extract_hog_features(path))
+            labels.append(label)
+            paths.append(path)
+
+    return np.array(features), np.array(labels), paths
