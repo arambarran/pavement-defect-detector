@@ -1,0 +1,69 @@
+# Python bytecode and interpreter caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+.python-version
+
+# uv and packaging artifacts
+.uv-cache/
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Test, coverage, and type-check caches
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# Jupyter notebook runtime files
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# Streamlit local configuration and secrets
+.streamlit/secrets.toml
+
+# Local environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and runtime output
+*.log
+logs/
+tmp/
+temp/
+
+# Machine learning datasets, generated models, and experiment outputs
+data/
+datasets/
+models/
+checkpoints/
+runs/
+outputs/
+*.joblib
+*.pkl
+*.pickle
+*.npy
+*.npz
+
+# Generated image and video outputs
+*.avi
+*.mp4
+*.mov
+*.mkv
+*.webm
+
+# OS and editor metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
