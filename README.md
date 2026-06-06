@@ -82,6 +82,12 @@ Train the first classifier:
 uv run python -m src.train_classifier
 ```
 
+Evaluate the saved classifier on the test set:
+
+```bash
+uv run python -m src.evaluate_classifier
+```
+
 By default this downloads:
 
 ```text
