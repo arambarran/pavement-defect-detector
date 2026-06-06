@@ -42,6 +42,7 @@ pavement-defect-detector/
 │   ├── train_classifier.py
 │   ├── evaluate_classifier.py
 │   ├── analyze_errors.py
+│   ├── app.py
 │   └── predict.py
 ├── main.py
 ├── pyproject.toml
@@ -100,6 +101,12 @@ Predict one image:
 
 ```bash
 uv run python -m src.predict path/to/image.jpg
+```
+
+Run the Streamlit app:
+
+```bash
+uv run streamlit run src/app.py
 ```
 
 ## Current Baseline

@@ -36,10 +36,15 @@ def preprocess_image(image: np.ndarray) -> np.ndarray:
     return grayscale_image
 
 
-def extract_hog_features(path: Path) -> np.ndarray:
+def extract_hog_features_from_image(image: np.ndarray) -> np.ndarray:
     # This is the full image-to-numbers step used by the classifier.
-    image = load_image(path)
     processed_image = preprocess_image(image)
     features = HOG_DESCRIPTOR.compute(processed_image)
 
     return features.flatten()
+
+
+def extract_hog_features(path: Path) -> np.ndarray:
+    image = load_image(path)
+
+    return extract_hog_features_from_image(image)
