@@ -44,6 +44,38 @@ Install dependencies with [uv](https://github.com/astral-sh/uv):
 uv sync
 ```
 
+## Download Dataset
+
+Create a Kaggle API token from your Kaggle account settings, then place it at:
+
+```text
+~/.kaggle/kaggle.json
+```
+
+Set the expected file permissions:
+
+```bash
+chmod 600 ~/.kaggle/kaggle.json
+```
+
+Download the binary pothole classification dataset through the Kaggle API:
+
+```bash
+uv run python -m src.download_dataset
+```
+
+By default this downloads:
+
+```text
+atulyakumar98/pothole-detection-dataset
+```
+
+and stores KaggleHub's cache under:
+
+```text
+data/raw/kagglehub/
+```
+
 Run the project:
 
 ```bash
