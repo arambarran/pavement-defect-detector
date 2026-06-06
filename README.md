@@ -64,6 +64,12 @@ Download the binary pothole classification dataset through the Kaggle API:
 uv run python -m src.download_dataset
 ```
 
+Inspect the downloaded dataset:
+
+```bash
+uv run python -m src.inspect_dataset
+```
+
 By default this downloads:
 
 ```text
