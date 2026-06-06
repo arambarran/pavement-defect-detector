@@ -42,6 +42,7 @@ pavement-defect-detector/
 │   ├── train_classifier.py
 │   ├── evaluate_classifier.py
 │   ├── analyze_errors.py
+│   ├── visualize_errors.py
 │   ├── app.py
 │   └── predict.py
 ├── main.py
@@ -95,6 +96,7 @@ uv run python -m src.prepare_dataset
 uv run python -m src.train_classifier
 uv run python -m src.evaluate_classifier
 uv run python -m src.analyze_errors
+uv run python -m src.visualize_errors
 ```
 
 Predict one image:
@@ -149,6 +151,8 @@ Error analysis report:
 
 ```text
 outputs/error_analysis.csv
+outputs/false_positives.png
+outputs/false_negatives.png
 ```
 
 ## Generated Files
