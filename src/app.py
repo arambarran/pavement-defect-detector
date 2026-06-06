@@ -61,7 +61,7 @@ def main() -> None:
         st.info("Upload an image to run a prediction.")
         return
 
-    st.image(uploaded_file, caption="Uploaded image", use_container_width=True)
+    st.image(uploaded_file, caption="Uploaded image", width="stretch")
 
     try:
         image = read_uploaded_image(uploaded_file)
