@@ -54,18 +54,6 @@ Install dependencies:
 uv sync
 ```
 
-Create a Kaggle API token from your Kaggle account settings and place it here:
-
-```text
-~/.kaggle/kaggle.json
-```
-
-Set token permissions:
-
-```bash
-chmod 600 ~/.kaggle/kaggle.json
-```
-
 ## Dataset
 
 Default Kaggle dataset:
@@ -78,6 +66,12 @@ KaggleHub stores downloaded files under:
 
 ```text
 data/raw/kagglehub/
+```
+
+Download the dataset:
+
+```bash
+uv run python -m src.download_dataset
 ```
 
 The raw dataset is expected to contain:
