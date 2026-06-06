@@ -70,6 +70,12 @@ Inspect the downloaded dataset:
 uv run python -m src.inspect_dataset
 ```
 
+Prepare train, validation, and test folders:
+
+```bash
+uv run python -m src.prepare_dataset
+```
+
 By default this downloads:
 
 ```text
